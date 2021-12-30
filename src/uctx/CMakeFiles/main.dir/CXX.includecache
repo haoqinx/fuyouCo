@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/hqin/fuyouCo/src/uctx/Coroutine.cpp
+Coroutine.h
+/home/hqin/fuyouCo/src/uctx/Coroutine.h
+stdio.h
+-
+stdlib.h
+-
+assert.h
+-
+stddef.h
+-
+string.h
+-
+stdint.h
+-
+sys/ucontext.h
+-
+ucontext.h
+-
+
+/home/hqin/fuyouCo/src/uctx/Coroutine.h
+
+/home/hqin/fuyouCo/src/uctx/Main.cpp
+Coroutine.h
+/home/hqin/fuyouCo/src/uctx/Coroutine.h
+stdio.h
+-
+
