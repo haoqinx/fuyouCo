@@ -1,50 +1,50 @@
 #include "Coroutine.h"
 #include <stdio.h>
+#include <memory>
+#include <unistd.h>
+#include <chrono>
+#include <thread>
+#include <iostream>
+
+using namespace fuyou;
 
 struct args {
 	int n;
 };
 
-static void
-foo(struct schedule * S, void *ud) {
+void foo(CoScheduler* s, void *ud) {
 	struct args * arg = (struct args*)ud;
 	int start = arg->n;
 	int i;
 	for (i=0;i<5;i++) {
-		printf("coroutine %d : %d\n",coroutine_running(S) , start + i);
+		printf("coroutine %d : %d\n",s->currentCo() , start + i);
 		// 切出当前协程
-		coroutine_yield(S);
+		s->yield();
 	}
 }
 
-static void
-test(struct schedule *S) {
+void test(CoScheduler* s) {
 	struct args arg1 = { 0 };
 	struct args arg2 = { 100 };
 
 	// 创建两个协程
-	int co1 = coroutine_new(S, foo, &arg1);
-	int co2 = coroutine_new(S, foo, &arg2);
+	int co1 = s -> createCoroutine(foo, (void*)&arg1);
+	int co2 = s -> createCoroutine(foo, (void*)&arg2);
 
 	printf("main start\n");
-	while (coroutine_status(S,co1) && coroutine_status(S,co2)) {
+	while (s -> getStatus(co1) && s -> getStatus(co2)) {
 		// 使用协程co1
-		coroutine_resume(S,co1);
+		s -> resume(co1);
 		// 使用协程co2
-		coroutine_resume(S,co2);
+		s -> resume(co2);
 	} 
 	printf("main end\n");
 }
 
-int 
-main() {
+int  main() {
 	// 创建一个协程调度器
-	struct schedule * S = coroutine_open();
-	
-	test(S);
-
-	// 关闭协程调度器
-	coroutine_close(S);
-	
+	CoScheduler* s = new CoScheduler();
+	test(s);
+	delete(s);
 	return 0;
 }

@@ -1,36 +1,87 @@
-#ifndef C_COROUTINE_H
-#define C_COROUTINE_H
+#pragma once
+#include <stdlib.h>
+#include <stdint.h>
+#include <memory>
+#include <vector>
+#include <functional>
+#include <assert.h>
 
-#define COROUTINE_DEAD 0
-#define COROUTINE_READY 1
-#define COROUTINE_RUNNING 2
-#define COROUTINE_SUSPEND 3
-
-// 协程调度器
-// 为了ABI兼容，这里故意没有提供具体实现
-struct schedule;
-
-typedef void (*coroutine_func)(struct schedule *, void *ud);
-
-// 开启一个协程调度器
-struct schedule * coroutine_open(void);
-
-// 关闭一个协程调度器
-void coroutine_close(struct schedule *);
-
-// 创建一个协程
-int coroutine_new(struct schedule *, coroutine_func, void *ud);
-
-// 切换到对应协程中执行
-void coroutine_resume(struct schedule *, int id);
-
-// 返回协程状态
-int coroutine_status(struct schedule *, int id);
-
-// 协程是否在正常运行
-int coroutine_running(struct schedule *);
-
-// 切出协程
-void coroutine_yield(struct schedule *);
-
+#if defined(__APPLE__) && (defined(__MACH__))
+    #include <sys/ucontext.h>
+#else
+    #include <ucontext.h>
 #endif
+
+namespace fuyou
+{
+const int STACK_SIZE = 1024 * 1024;
+const int DEFAULT_COROUTINE = 16;
+enum CoStatus {
+    COURTINUE_DEAD = 0,
+    COURTINUE_READY,
+    COURTINUE_RUNNING,
+    COURTINUE_SUSPEND
+};
+
+
+class CoScheduler;
+using coroutineFunc = std::function<void(CoScheduler*, void*)>;
+ 
+class Coroutine{
+public:
+    Coroutine(coroutineFunc func, void* args, CoScheduler* sche);
+    ~Coroutine();
+    
+    void saveStack(char* top);
+    void dofunc();
+    int getStatus(){
+        return status_;
+    }
+    void setId(int id){
+        id_ = id;
+    }
+    
+public:
+    coroutineFunc func_;
+    void* args_;
+    CoScheduler* sehcduler_;
+    ptrdiff_t capacity_;
+    ptrdiff_t curSize_;
+    ucontext_t ctx_;
+    CoStatus status_;
+    char* stack_;
+    int id_;
+};
+
+class CoScheduler{
+public:
+    CoScheduler();
+    ~CoScheduler();
+    int createCoroutine(coroutineFunc func, void* args);
+    void deleteCoroutine(int id);
+    void resume(int id);
+    void yield();
+    int currentCo(){
+        return runningCo_;
+    }
+    int getStatus(int id){
+        assert(id>=0 && id < capacity_);
+        if (coroutines_[id] == nullptr) {
+            return COURTINUE_DEAD;
+        }
+        return coroutines_[id] -> status_;
+    }
+public:
+    CoScheduler(const CoScheduler&) = delete;
+    CoScheduler& operator=(const CoScheduler&) = delete;
+    char stack_[STACK_SIZE];
+    ucontext_t mainCtx_;
+    int numCoroutines_;
+    int capacity_;
+    int runningCo_;
+    std::vector<Coroutine*> coroutines_;
+};
+
+
+
+} // namespace fuyou

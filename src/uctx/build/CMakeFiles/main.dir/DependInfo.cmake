@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/hqin/fuyouCo/src/uctx/Coroutine.cpp" "/home/hqin/fuyouCo/src/uctx/CMakeFiles/main.dir/Coroutine.cpp.o"
-  "/home/hqin/fuyouCo/src/uctx/Main.cpp" "/home/hqin/fuyouCo/src/uctx/CMakeFiles/main.dir/Main.cpp.o"
+  "/home/hqin/fuyouCo/src/uctx/Coroutine.cpp" "/home/hqin/fuyouCo/src/uctx/build/CMakeFiles/main.dir/Coroutine.cpp.o"
+  "/home/hqin/fuyouCo/src/uctx/Main.cpp" "/home/hqin/fuyouCo/src/uctx/build/CMakeFiles/main.dir/Main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

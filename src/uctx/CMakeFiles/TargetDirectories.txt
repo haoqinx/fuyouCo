@@ -1,3 +1,0 @@
-/home/hqin/fuyouCo/src/uctx/CMakeFiles/rebuild_cache.dir
-/home/hqin/fuyouCo/src/uctx/CMakeFiles/main.dir
-/home/hqin/fuyouCo/src/uctx/CMakeFiles/edit_cache.dir
