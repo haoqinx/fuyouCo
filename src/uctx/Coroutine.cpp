@@ -63,8 +63,6 @@ void CoScheduler::resume(int id){
         return;
     }
     int status = co -> getStatus();
-    printf("current coid:%d, status:%d \n", id, status);
-
     switch(status){
         case COURTINUE_READY:
         {
@@ -90,6 +88,7 @@ void CoScheduler::resume(int id){
         }
         default:
             assert(0);
+            exit(-1);
     }
 }
 
