@@ -7,6 +7,7 @@ namespace fuyou
 // std::shared_ptr<CoScheduler> gScheduler = std::shared_ptr<CoScheduler>(new CoScheduler());
 
 static void mainfunc(uint32_t low32, uint32_t h32){
+    //makecontext函数传递的参数是int
     uintptr_t ptr = (uintptr_t)low32 | ((uintptr_t)h32 << 32);
     CoScheduler* sche = (CoScheduler*)ptr;
     int id = sche -> runningCo_;
@@ -57,7 +58,6 @@ int CoScheduler::createCoroutine(coroutineFunc func, void* args){
 void CoScheduler::resume(int id){
     assert(runningCo_ == -1);
     assert(id > 0 && id < capacity_);
-
     Coroutine* co = coroutines_[id];
     if(! co){
         return;
