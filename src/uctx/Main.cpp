@@ -45,8 +45,6 @@ int  main() {
 	// 创建一个协程调度器
 	CoScheduler* s = new CoScheduler();
 	test(s);
-
-	
 	delete(s);
 	return 0;
 }
