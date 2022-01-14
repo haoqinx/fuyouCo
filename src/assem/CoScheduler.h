@@ -26,7 +26,7 @@ public:
     size_t stackSize_;
     unsigned int spawnedCors_;
     uint64_t timeout_;
-    Coroutine* currThread_;
+    Coroutine* currCos_;
     int pageSize_;
     int pollerfd_;
     int eventfd_;
@@ -61,7 +61,6 @@ public:
     CoroutineComputeStatus computeStatus_;
 };
 
-int _switch(Coroutine* new_ctx, CoroutineCtx *cur_ctx);
-static void _exec(void *lt);
+static inline CoroutineScheduler* getSched();
 
 };

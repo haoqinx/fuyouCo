@@ -22,6 +22,9 @@ public:
     }
     void yield();
     void setStatus();
+    int resume();
+    void init();
+    
 public:
     using SP_CoroutineComputeSche = std::shared_ptr<CoroutineComputeSche>;
     using SP_pollfd = std::shared_ptr<struct pollfd>;
