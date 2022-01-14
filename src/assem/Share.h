@@ -1,0 +1,50 @@
+#pragma once 
+
+
+
+namespace fuyou{
+enum CoroutineStatus {
+    COROUTINE_STATUS_WAIT_READ = 0,
+    COROUTINE_STATUS_WAIT_WRITE,
+	COROUTINE_STATUS_NEW,
+	COROUTINE_STATUS_READY,
+	COROUTINE_STATUS_EXITED,
+	COROUTINE_STATUS_BUSY,
+	COROUTINE_STATUS_SLEEPING,
+	COROUTINE_STATUS_EXPIRED,
+	COROUTINE_STATUS_FDEOF,
+	COROUTINE_STATUS_DETACH,
+	COROUTINE_STATUS_CANCELLED,
+	COROUTINE_STATUS_PENDING_RUNCOMPUTE,
+	COROUTINE_STATUS_RUNCOMPUTE,
+	COROUTINE_STATUS_WAIT_IO_READ,
+	COROUTINE_STATUS_WAIT_IO_WRITE,
+	COROUTINE_STATUS_WAIT_MULTI
+};
+
+enum CoroutineComputeStatus{
+    COROUTINE_COMPUTE_BUSY = 0,
+	COROUTINE_COMPUTE_FREE
+};
+
+enum CoroutineEventStatus{
+    COROUTINE_EV_READ = 0,
+	COROUTINE_EV_WRITE
+};
+// core register
+struct CoroutineCtx{
+    void* esp;
+    void* ebp;
+	void* eip;
+	void* edi;
+	void* esi;
+	void* ebx;
+	void* r1;
+	void* r2;
+	void* r3;
+	void* r4;
+	void* r5;
+};
+
+
+};
