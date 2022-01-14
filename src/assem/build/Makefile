@@ -177,6 +177,33 @@ Coroutine.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Coroutine.cpp.s
 .PHONY : Coroutine.cpp.s
 
+Epoll.o: Epoll.cpp.o
+
+.PHONY : Epoll.o
+
+# target to build an object file
+Epoll.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Epoll.cpp.o
+.PHONY : Epoll.cpp.o
+
+Epoll.i: Epoll.cpp.i
+
+.PHONY : Epoll.i
+
+# target to preprocess a source file
+Epoll.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Epoll.cpp.i
+.PHONY : Epoll.cpp.i
+
+Epoll.s: Epoll.cpp.s
+
+.PHONY : Epoll.s
+
+# target to generate assembly for a file
+Epoll.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Epoll.cpp.s
+.PHONY : Epoll.cpp.s
+
 Main.o: Main.cpp.o
 
 .PHONY : Main.o
@@ -219,6 +246,9 @@ help:
 	@echo "... Coroutine.o"
 	@echo "... Coroutine.i"
 	@echo "... Coroutine.s"
+	@echo "... Epoll.o"
+	@echo "... Epoll.i"
+	@echo "... Epoll.s"
 	@echo "... Main.o"
 	@echo "... Main.i"
 	@echo "... Main.s"

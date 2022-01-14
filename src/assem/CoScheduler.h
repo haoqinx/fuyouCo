@@ -12,7 +12,7 @@ namespace fuyou
 {
 #define BIT(x) (1 << (x))
 class Coroutine;
-using SP_Coroutine = std::shared_ptr<Coroutine>;
+// using SP_Coroutine = std::shared_ptr<Coroutine>;
 
 class CoroutineScheduler{
 public:
@@ -35,13 +35,13 @@ public:
     int nNewevents_;
     pthread_mutex_t deferMutex_;
     // co queue
-    std::queue<SP_Coroutine> readyCos_;
-    std::queue<SP_Coroutine> deferCos_;
+    std::queue<Coroutine*> readyCos_;
+    std::queue<Coroutine*> deferCos_;
     // co link
-    std::list<SP_Coroutine> busyCos_;
+    std::list<Coroutine*> busyCos_;
     //
-    std::set<SP_Coroutine> sleepingCos_;
-    std::set<SP_Coroutine> waitingCos_;
+    std::set<Coroutine*> sleepingCos_;
+    std::set<Coroutine*> waitingCos_;
 
 };
 
@@ -49,18 +49,20 @@ class CoroutineComputeSche{
 
 public:
     CoroutineCtx ctx_;
-    std::queue<Coroutine> coroutines_;
-    SP_Coroutine curCoroutine_;
+    std::queue<Coroutine*> coroutines_;
+    // SP_Coroutine curCoroutine_;
+    Coroutine* curCoroutine_;
 
     pthread_mutex_t runMutex_;
     pthread_cond_t runCond_;
 
     pthread_mutex_t coMutex_;
-    std::list<SP_Coroutine> computeCos_;
+    std::list<Coroutine*> computeCos_;
 
     CoroutineComputeStatus computeStatus_;
 };
 
-static inline CoroutineScheduler* getSched();
+void scheSleepDown(Coroutine* co, uint64_t msecs);
+
 
 };

@@ -24,10 +24,14 @@ public:
     void setStatus();
     int resume();
     void init();
-    
+    void renice();
+    // void sleep(uint64_t msecs);
+    void sleepdown(uint64_t msecs);
+
 public:
-    using SP_CoroutineComputeSche = std::shared_ptr<CoroutineComputeSche>;
-    using SP_pollfd = std::shared_ptr<struct pollfd>;
+    // using SP_CoroutineComputeSche = std::shared_ptr<CoroutineComputeSche>;
+    // using SP_pollfd = std::shared_ptr<struct pollfd>;
+    // using SP_CoroutineScheduler = std::shared_ptr<CoroutineScheduler>;
 public:
     struct IOinfo{
         void* buf;
@@ -45,7 +49,9 @@ public:
     size_t lastStackSize_;
     //status
     CoroutineStatus status_;
-    std::weak_ptr<CoroutineScheduler> sche_;
+    // std::weak_ptr<CoroutineScheduler> sche_;
+    // scheduler
+    CoroutineScheduler* sche_;
     // attr
     uint64_t birth_;
     uint64_t id_;
@@ -63,12 +69,19 @@ public:
 
     //io
     IOinfo io_;
-    SP_CoroutineComputeSche compSche_;
+    // SP_CoroutineComputeSche compSche_;
+    CoroutineComputeSche* compSche_;
     int fdsReady_;
-    SP_pollfd pfds_; 
+    std::vector<struct pollfd> pfds_; 
     nfds_t nfds_;
 
 };
-
+void sleep(uint64_t msecs);
+static inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2);
+static inline uint64_t coroutineUsecNow();
+static inline void coroutineMadvise(Coroutine* co);
+static void schedKeyDestructor(void *data);
+static void schedKeyCreator(void);
+void scheSleepDown(Coroutine* co, uint64_t msecs);
 } // namespace fuyou
 

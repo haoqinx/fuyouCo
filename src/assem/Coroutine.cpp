@@ -1,6 +1,65 @@
 #include "Coroutine.h"
+#include <sys/time.h>
+#include <pthread.h>
+#include <sys/mman.h>
+#include <assert.h>
+
 namespace fuyou
 {
+
+pthread_key_t global_sched_key;
+static pthread_once_t sched_key_once = PTHREAD_ONCE_INIT;
+
+//static functions
+static inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2){
+    return t2 - t1;
+}
+
+static inline uint64_t coroutineUsecNow(){
+    struct timeval t1;
+    gettimeofday(&t1, nullptr);
+    return t1.tv_sec * 1000000 + t1.tv_usec;
+}
+
+static inline void coroutineMadvise(Coroutine* co){
+    size_t current_stack = (char*)(co -> stack_ + co -> stackSize_) - (char*)(co -> ctx_.esp);
+    assert(current_stack <= co -> stackSize_);
+    if(current_stack < co -> lastStackSize_ &&
+        co -> lastStackSize_ > co -> sche_ -> pageSize_){
+        size_t tmp = current_stack + (- current_stack & (co -> sche_ -> pageSize_ - 1));
+        assert(madvise(co -> stack_, co -> stackSize_ - tmp, MADV_DONTNEED) == 0);        
+    }
+    co -> lastStackSize_ = current_stack;
+}
+
+static void schedKeyDestructor(void *data){
+    free(data);
+}
+
+static void schedKeyCreator(void){
+    assert(pthread_key_create(&global_sched_key, schedKeyDestructor) == 0);
+	assert(pthread_setspecific(global_sched_key, NULL) == 0);
+	return ;
+}
+
+void scheSleepDown(Coroutine* co, uint64_t msecs){
+    uint64_t usecs = msecs * 1000u;
+    std::set<Coroutine*> sleeps = co -> sche_ -> sleepingCos_;
+    auto co_find = sleeps.find(co);
+    if(co_find != sleeps.end()){
+        sleeps.erase(co);
+    }
+    co -> sleepUsecs_ = coroutineDiff(co -> sche_ -> birth_, coroutineUsecNow()) + usecs;
+    do{
+        auto res = sleeps.insert(co);
+        if(res.second){
+            printf("sleep_usecs %u\n", co -> sleepUsecs_);
+        }
+        co -> status_ = (CoroutineStatus)((unsigned int)co -> status_ | 
+                    BIT(COROUTINE_STATUS_SLEEPING));
+    }while(false);
+}
+
 extern "C"{
     int _switch(CoroutineCtx* new_ctx, CoroutineCtx *cur_ctx);
 }
@@ -79,9 +138,22 @@ static void _exec(void *lt){
     co -> yield();
 }
 
+static inline CoroutineScheduler* getSched(){
+    return (CoroutineScheduler*)pthread_getspecific(global_sched_key);
+}
+
+Coroutine::Coroutine(){
+    assert(pthread_once(&sched_key_once, schedKeyCreator) == 0);
+    CoroutineScheduler* sche = getSched();
+    if(sche == nullptr){
+
+    }
+
+}
+
 Coroutine::~Coroutine(){
-    if(sche_.lock()){
-        sche_.lock() -> spawnedCors_ --;
+    if(sche_){
+        sche_ -> spawnedCors_ --;
     }
     else{
         perror("no shce");
@@ -105,10 +177,8 @@ void Coroutine::init(){
 
 void Coroutine::yield(){
     ops_ = 0;
-    _switch(&(sche_.lock() -> ctx_), &ctx_);
+    _switch(&(sche_ -> ctx_), &ctx_);
 }
-
-
 
 int Coroutine::resume(){
     if((unsigned int)status_ & BIT(COROUTINE_STATUS_NEW)){
@@ -116,7 +186,51 @@ int Coroutine::resume(){
     }
     CoroutineScheduler* sche = getSched();
     sche -> currCos_ = this;
-    _switch(&ctx_, &(sche_.lock() -> ctx_));
+    _switch(&ctx_, &(sche_ -> ctx_));
+    sche -> currCos_ = nullptr;
+
+    coroutineMadvise(this);
+    if((unsigned int)status_ & BIT(COROUTINE_STATUS_EXITED)){
+        if((unsigned int)status_ & BIT(COROUTINE_STATUS_DETACH)){
+            printf("resume...");
+            //nty_coroutine_free(co);
+        }
+        return -1;
+    }
+    return 0;
 }
+
+void Coroutine::renice(){
+    ++ ops_;
+    if(ops_ < 5) return;
+    printf("%d renice....", id_);
+    sche_ -> readyCos_.push(this);
+    yield();
+}
+
+void Coroutine::sleepdown(uint64_t msecs){
+    uint64_t usecs = msecs * 1000u;
+    Coroutine* co_tmp = *(this -> sche_ -> sleepingCos_).begin();
+}
+// handle current coroutine
+//sleep
+void curCoroutineSleep(uint64_t msecs){
+    Coroutine* co = getSched() -> currCos_;
+    if(msecs == 0){
+        co -> sche_ -> readyCos_.push(co);
+        co -> yield();
+    }
+    else{
+        scheSleepDown(co, msecs);
+    }
+}
+//detach
+void curCoroutineDetach(){
+    Coroutine* co = getSched() -> currCos_;
+    co -> status_ = (CoroutineStatus)((unsigned int)co -> status_ | 
+                    BIT(COROUTINE_STATUS_DETACH));
+}
+
+
 
 }
