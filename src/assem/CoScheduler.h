@@ -56,7 +56,7 @@ public:
     // co queue
     std::queue<Coroutine*> deferCos_;
     std::queue<Coroutine*> readyCos_;
-    // co link
+    // co linklist
     std::list<Coroutine*> busyCos_;
     //
     std::set<Coroutine*, sleepcmp> sleepingCos_;
