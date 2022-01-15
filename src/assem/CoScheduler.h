@@ -24,6 +24,9 @@ public:
                         int pollerfd);
     ~CoroutineScheduler();
     Coroutine* scheduleExpired();
+    int isDone();
+    uint64_t minTimeout();
+    int doEpoll();
 public:
     struct sleepcmp{
         bool operator()(const Coroutine* co1, const Coroutine* co2){
@@ -51,8 +54,8 @@ public:
     int nNewevents_;
     pthread_mutex_t deferMutex_;
     // co queue
-    std::queue<Coroutine*> readyCos_;
     std::queue<Coroutine*> deferCos_;
+    std::queue<Coroutine*> readyCos_;
     // co link
     std::list<Coroutine*> busyCos_;
     //

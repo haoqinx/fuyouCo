@@ -325,7 +325,7 @@ int scheCreate(int stacksize){
     assert(pthread_setspecific(global_sched_key, sched) == 0);
 }
 
-int scheFree(CoroutineScheduler* sche){
+void scheFree(CoroutineScheduler* sche){
     delete(sche);
     assert(pthread_setspecific(global_sched_key, NULL) == 0);
 }
@@ -380,6 +380,52 @@ void Coroutine::scheduleScheWait(int fd, unsigned short events, uint64_t timeout
     if(timeout == 1) return;
     scheduleScheSleepdown(timeout);
 }
-
+void scheRun(){
+    CoroutineScheduler* sche = getSched();
+    if(sche == nullptr){
+        perror("sche has not been created...");
+        return;
+    }
+    while(! sche -> isDone()){
+        // 1: sleep set
+        Coroutine* expired = nullptr;
+        while((expired = sche -> scheduleExpired()) != nullptr){
+            expired -> resume();
+        }
+        // 2:ready queue
+        auto readyq = sche -> readyCos_;
+        Coroutine* last_co_ready = readyq.back();
+        while(! readyq.empty()){
+            Coroutine* co = readyq.front();
+            readyq.pop();
+            if((unsigned int)co -> status_ & BIT(COROUTINE_STATUS_FDEOF)){
+                delete(co);
+                break;
+            }
+            else{
+                co -> resume();
+                if(co == last_co_ready) break;
+            }
+        }
+        //3：wait set
+        sche -> doEpoll();
+        while(sche -> nNewevents_){
+            int index = -- sche -> nNewevents_;
+            struct epoll_event* ev = &(sche -> eventlist_[index]);
+            int fd = ev -> data.fd;
+            int is_eof = ev -> events & EPOLLHUP;
+            Coroutine* co = scheSearchWait(fd);
+            if(co != nullptr){
+                if(is_eof){
+                    co -> status_ = (CoroutineStatus)((unsigned int)(co -> status_) | COROUTINE_STATUS_FDEOF);
+                }
+                co -> resume();
+            }
+            is_eof = 0;
+        }
+    }
+    scheFree(sche);
+    return;
+}
 
 }

@@ -86,7 +86,8 @@ int coCreate(Coroutine** newCo, proc_coroutine func, void* args);
 // inline int coWaitcmp(Coroutine* co1, Coroutine* co2);
 //sche life cycle
 int scheCreate(int stacksize);
-int scheFree(CoroutineScheduler*);
+void scheFree(CoroutineScheduler*);
+void scheRun();
 // void sleep(uint64_t msecs);
 // helper
 inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2);
@@ -97,9 +98,9 @@ void schedKeyCreator(void);
 void scheSleepDown(Coroutine* co, uint64_t msecs);
 inline CoroutineScheduler* getSched();
 // find co by fd
-Coroutine* searchWait(int fd);
+Coroutine* scheSearchWait(int fd);
 // find co in waitset and sleep
-Coroutine* descheWait(int fd);
+Coroutine* scheDescheWait(int fd);
 
 } // namespace fuyou
 
