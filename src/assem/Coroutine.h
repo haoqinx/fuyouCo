@@ -12,8 +12,6 @@ class CoroutineComputeSche;
 constexpr unsigned int CO_MAX_EVENTS = 1024 * 1024;
 constexpr unsigned int CO_MAX_STACKSIZE = 16 * 1024;
 
-
-
 using proc_coroutine = std::function<void(void*)>;
 
 class Coroutine{
@@ -88,19 +86,20 @@ int coCreate(Coroutine** newCo, proc_coroutine func, void* args);
 // inline int coWaitcmp(Coroutine* co1, Coroutine* co2);
 //sche life cycle
 int scheCreate(int stacksize);
-
+int scheFree(CoroutineScheduler*);
 // void sleep(uint64_t msecs);
 // helper
-static inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2);
+inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2);
 inline uint64_t coroutineUsecNow();
-static inline void coroutineMadvise(Coroutine* co);
-static void schedKeyDestructor(void *data);
-static void schedKeyCreator(void);
+inline void coroutineMadvise(Coroutine* co);
+void schedKeyDestructor(void *data);
+void schedKeyCreator(void);
 void scheSleepDown(Coroutine* co, uint64_t msecs);
 inline CoroutineScheduler* getSched();
 // find co by fd
 Coroutine* searchWait(int fd);
 // find co in waitset and sleep
 Coroutine* descheWait(int fd);
+
 } // namespace fuyou
 

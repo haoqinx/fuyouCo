@@ -9,12 +9,10 @@
 
 namespace fuyou
 {
-
 pthread_key_t global_sched_key;
 static pthread_once_t sched_key_once = PTHREAD_ONCE_INIT;
-
 //static functions
-static inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2){
+inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2){
     return t2 - t1;
 }
 
@@ -24,7 +22,7 @@ inline uint64_t coroutineUsecNow(){
     return t1.tv_sec * 1000000 + t1.tv_usec;
 }
 
-static inline void coroutineMadvise(Coroutine* co){
+inline void coroutineMadvise(Coroutine* co){
     size_t current_stack = (char*)(co -> stack_ + co -> stackSize_) - (char*)(co -> ctx_.esp);
     assert(current_stack <= co -> stackSize_);
     if(current_stack < co -> lastStackSize_ &&
@@ -35,11 +33,11 @@ static inline void coroutineMadvise(Coroutine* co){
     co -> lastStackSize_ = current_stack;
 }
 
-static void schedKeyDestructor(void *data){
+void schedKeyDestructor(void *data){
     free(data);
 }
 
-static void schedKeyCreator(void){
+void schedKeyCreator(void){
     assert(pthread_key_create(&global_sched_key, schedKeyDestructor) == 0);
 	assert(pthread_setspecific(global_sched_key, NULL) == 0);
 	return ;
@@ -327,6 +325,11 @@ int scheCreate(int stacksize){
     assert(pthread_setspecific(global_sched_key, sched) == 0);
 }
 
+int scheFree(CoroutineScheduler* sche){
+    delete(sche);
+    assert(pthread_setspecific(global_sched_key, NULL) == 0);
+}
+
 Coroutine* scheSearchWait(int fd){
     auto sche = getSched();
     auto wset = sche -> waitingCos_;
@@ -375,7 +378,8 @@ void Coroutine::scheduleScheWait(int fd, unsigned short events, uint64_t timeout
     auto co_tmp = sche_ -> waitingCos_.find(this);
     assert(co_tmp == sche_ -> waitingCos_.end());
     if(timeout == 1) return;
-
+    scheduleScheSleepdown(timeout);
 }
+
 
 }

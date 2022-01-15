@@ -17,7 +17,13 @@ Coroutine.h
 /home/hqin/fuyouCo/src/assem/Coroutine.h
 assert.h
 -
+stdio.h
+-
 string.h
+-
+stdlib.h
+-
+unistd.h
 -
 
 /home/hqin/fuyouCo/src/assem/CoScheduler.h

@@ -23,6 +23,7 @@ public:
                         uint64_t tiemout,
                         int pollerfd);
     ~CoroutineScheduler();
+    Coroutine* scheduleExpired();
 public:
     struct sleepcmp{
         bool operator()(const Coroutine* co1, const Coroutine* co2){
