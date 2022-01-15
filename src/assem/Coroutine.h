@@ -1,11 +1,14 @@
 #pragma once
 #include "Share.h"
-#include "CoScheduler.h"
 #include <functional>
 #include <memory>
 #include <sys/poll.h>
+#include <vector>
 namespace fuyou
 {
+class CoroutineScheduler;
+class CoroutineComputeSche;
+
 constexpr unsigned int CO_MAX_EVENTS = 1024 * 1024;
 constexpr unsigned int CO_MAX_STACKSIZE = 16 * 1024;
 
@@ -15,7 +18,8 @@ using proc_coroutine = std::function<void(void*)>;
 
 class Coroutine{
 public: 
-    Coroutine();
+    Coroutine(CoroutineScheduler* sche, int stackSize, int id, 
+                proc_coroutine func, int fd, unsigned short events, void* args);
     ~Coroutine();
     void dofunc(){
         func_(args_);
@@ -27,6 +31,7 @@ public:
     void renice();
     // void sleep(uint64_t msecs);
     void sleepdown(uint64_t msecs);
+    void scheduleDeschedAndSleepdown();
 
 public:
     // using SP_CoroutineComputeSche = std::shared_ptr<CoroutineComputeSche>;
@@ -76,13 +81,25 @@ public:
     nfds_t nfds_;
 
 };
-void sleep(uint64_t msecs);
+// coroutine life cycle
+int coCreate(Coroutine** newCo, proc_coroutine func, void* args);
+inline int coSleepcmp(Coroutine* co1, Coroutine* co2);
+inline int coWaitcmp(Coroutine* co1, Coroutine* co2);
+//sche life cycle
+int scheCreate(int stacksize);
+
+// void sleep(uint64_t msecs);
+// helper
 static inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2);
-static inline uint64_t coroutineUsecNow();
+inline uint64_t coroutineUsecNow();
 static inline void coroutineMadvise(Coroutine* co);
 static void schedKeyDestructor(void *data);
 static void schedKeyCreator(void);
 void scheSleepDown(Coroutine* co, uint64_t msecs);
-static inline CoroutineScheduler* getSched();
+inline CoroutineScheduler* getSched();
+// find co by fd
+Coroutine* searchWait(int fd);
+// find co in waitset and sleep
+Coroutine* descheWait(int fd);
 } // namespace fuyou
 

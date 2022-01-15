@@ -7,18 +7,33 @@
 #include <set>
 #include <list>
 #include <memory>
+#include "Coroutine.h"
 
 namespace fuyou
 {
-#define BIT(x) (1 << (x))
+#define BIT(x)      (1 << (x))
+#define CLEARBIT(x) ~(1 << (x))
 class Coroutine;
 // using SP_Coroutine = std::shared_ptr<Coroutine>;
 
 class CoroutineScheduler{
 public:
-    CoroutineScheduler(int stackSize);
+    CoroutineScheduler(int stackSize, 
+                        int pagesize, 
+                        uint64_t tiemout,
+                        int pollerfd);
     ~CoroutineScheduler();
-
+public:
+    struct sleepcmp{
+        bool operator()(const Coroutine* co1, const Coroutine* co2){
+            return co1 -> sleepUsecs_ > co2 -> sleepUsecs_;
+        }
+    };
+    struct waitcmp{
+        bool operator()(const Coroutine* co1, const Coroutine* co2){
+            return co1 -> fd_ >co2 -> fd_;
+        }
+    };
 public:
     uint64_t birth_;
     CoroutineCtx ctx_;
@@ -40,8 +55,8 @@ public:
     // co link
     std::list<Coroutine*> busyCos_;
     //
-    std::set<Coroutine*> sleepingCos_;
-    std::set<Coroutine*> waitingCos_;
+    std::set<Coroutine*, sleepcmp> sleepingCos_;
+    std::set<Coroutine*, waitcmp> waitingCos_;
 
 };
 
@@ -61,7 +76,8 @@ public:
 
     CoroutineComputeStatus computeStatus_;
 };
-
+// shce life cycle
+int scheCreate(int stacksize);
 void scheSleepDown(Coroutine* co, uint64_t msecs);
 
 

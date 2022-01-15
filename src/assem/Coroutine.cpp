@@ -3,6 +3,9 @@
 #include <pthread.h>
 #include <sys/mman.h>
 #include <assert.h>
+#include <unistd.h>
+#include "Epoll.h"
+#include "CoScheduler.h"
 
 namespace fuyou
 {
@@ -15,7 +18,7 @@ static inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2){
     return t2 - t1;
 }
 
-static inline uint64_t coroutineUsecNow(){
+inline uint64_t coroutineUsecNow(){
     struct timeval t1;
     gettimeofday(&t1, nullptr);
     return t1.tv_sec * 1000000 + t1.tv_usec;
@@ -42,23 +45,23 @@ static void schedKeyCreator(void){
 	return ;
 }
 
-void scheSleepDown(Coroutine* co, uint64_t msecs){
-    uint64_t usecs = msecs * 1000u;
-    std::set<Coroutine*> sleeps = co -> sche_ -> sleepingCos_;
-    auto co_find = sleeps.find(co);
-    if(co_find != sleeps.end()){
-        sleeps.erase(co);
-    }
-    co -> sleepUsecs_ = coroutineDiff(co -> sche_ -> birth_, coroutineUsecNow()) + usecs;
-    do{
-        auto res = sleeps.insert(co);
-        if(res.second){
-            printf("sleep_usecs %u\n", co -> sleepUsecs_);
-        }
-        co -> status_ = (CoroutineStatus)((unsigned int)co -> status_ | 
-                    BIT(COROUTINE_STATUS_SLEEPING));
-    }while(false);
-}
+// void scheSleepDown(Coroutine* co, uint64_t msecs){
+//     uint64_t usecs = msecs * 1000u;
+//     auto sleeps = co -> sche_ -> sleepingCos_;
+//     auto co_find = sleeps.find(co);
+//     if(co_find != sleeps.end()){
+//         sleeps.erase(co);
+//     }
+//     co -> sleepUsecs_ = coroutineDiff(co -> sche_ -> birth_, coroutineUsecNow()) + usecs;
+//     do{
+//         auto res = sleeps.insert(co);
+//         if(res.second){
+//             printf("sleep_usecs %u\n", co -> sleepUsecs_);
+//         }
+//         co -> status_ = (CoroutineStatus)((unsigned int)co -> status_ | 
+//                     BIT(COROUTINE_STATUS_SLEEPING));
+//     }while(false);
+// }
 
 extern "C"{
     int _switch(CoroutineCtx* new_ctx, CoroutineCtx *cur_ctx);
@@ -138,16 +141,21 @@ static void _exec(void *lt){
     co -> yield();
 }
 
-static inline CoroutineScheduler* getSched(){
+inline CoroutineScheduler* getSched(){
     return (CoroutineScheduler*)pthread_getspecific(global_sched_key);
 }
 
-Coroutine::Coroutine(){
-    assert(pthread_once(&sched_key_once, schedKeyCreator) == 0);
-    CoroutineScheduler* sche = getSched();
-    if(sche == nullptr){
-
-    }
+Coroutine::Coroutine(CoroutineScheduler* sche, int stackSize, int id, 
+                    proc_coroutine func, int fd, unsigned short events, void* args):
+                    sche_(sche),
+                    stackSize_(stackSize),
+                    status_((CoroutineStatus) BIT(COROUTINE_STATUS_NEW)),
+                    id_(id),
+                    func_(func),
+                    fd_(fd),
+                    events_(events),
+                    args_(args),
+                    birth_(coroutineUsecNow()){
 
 }
 
@@ -210,7 +218,29 @@ void Coroutine::renice(){
 
 void Coroutine::sleepdown(uint64_t msecs){
     uint64_t usecs = msecs * 1000u;
-    Coroutine* co_tmp = *(this -> sche_ -> sleepingCos_).begin();
+    auto sset = this -> sche_ -> sleepingCos_;
+    auto co_tmp = sset.find(this);
+    if(co_tmp != sset.end()){
+        sset.erase(co_tmp);
+    }
+    this -> sleepUsecs_ = coroutineDiff(this -> sche_ -> birth_, coroutineUsecNow()) + usecs;
+    do{
+        auto res = sset.insert(this);
+        if(res.second){
+            printf("sleep_usecs %u\n", this -> sleepUsecs_);
+        }
+        this -> status_ = (CoroutineStatus)((unsigned int)this -> status_ | 
+                    BIT(COROUTINE_STATUS_SLEEPING));
+    }while(false);
+}
+
+void Coroutine::scheduleDeschedAndSleepdown(){
+    if((int)status_ & BIT(COROUTINE_STATUS_SLEEPING)){
+        this -> sche_ -> sleepingCos_.erase(this);
+        status_ = CoroutineStatus((int)status_ & CLEARBIT(COROUTINE_STATUS_SLEEPING));
+        status_ = CoroutineStatus((int)status_ | BIT(COROUTINE_STATUS_READY));
+        status_ = CoroutineStatus((int)status_ & CLEARBIT(COROUTINE_STATUS_EXPIRED));
+    }
 }
 // handle current coroutine
 //sleep
@@ -221,7 +251,8 @@ void curCoroutineSleep(uint64_t msecs){
         co -> yield();
     }
     else{
-        scheSleepDown(co, msecs);
+        // scheSleepDown(co, msecs);
+        co -> sleepdown(msecs);
     }
 }
 //detach
@@ -231,6 +262,93 @@ void curCoroutineDetach(){
                     BIT(COROUTINE_STATUS_DETACH));
 }
 
+int coCreate(Coroutine** newCo, proc_coroutine func, void* args){
+    assert(pthread_once(&sched_key_once, schedKeyCreator) == 0);
+    CoroutineScheduler* sche = getSched();
+    if(sche == nullptr){
+        scheCreate(0);
+        sche = getSched();
+        if (sche == nullptr) {
+			printf("Failed to create scheduler\n");
+			return -1;
+		}
+    }
+    
+    Coroutine* co = new Coroutine(sche, 
+                                  sche -> stackSize_, 
+                                  sche -> spawnedCors_ ++,
+                                  func,
+                                  -1, //fd
+                                  0,//events
+                                  args);
+    *newCo = co;
+    int ret = posix_memalign(&co -> stack_, getpagesize(), sche -> stackSize_);
+    if(ret) {
+        printf("failed to allocate stack for new co\n");
+        delete(co);
+        return -3;
+    }
+    return 0;
+}
+// inline int coSleepcmp(Coroutine* co1, Coroutine* co2){
+//     if (co1 -> sleepUsecs_ < co2 -> sleepUsecs_) {
+// 		return -1;
+// 	}
+// 	if (co1 -> sleepUsecs_ == co2 -> sleepUsecs_) {
+// 		return 0;
+// 	}
+// 	return 1;
+// }
+// inline int coWaitcmp(Coroutine* co1, Coroutine* co2){
+// 	if (co1->fd_ < co2->fd_) return -1;
+// 	else if (co1->fd_ == co2->fd_) return 0;
+// 	else return 1;
+// }
+int scheCreate(int stacksize){
+    int ssize = stacksize ? stacksize : CO_MAX_STACKSIZE;
+    int pollerfd = epollerCreate();
+    if(pollerfd < 0) {
+        perror("epoll create error");
+        return -2;
+    }
+    int pagesize = getpagesize();
+    int timeout = 3000000u;
 
+    CoroutineScheduler* sched = new CoroutineScheduler(ssize, 
+                                                      pagesize, 
+                                                      timeout, 
+                                                      pollerfd);
+    if(sched == nullptr){
+        printf("Fail to init scheduler");
+        return -1;
+    }
+    assert(pthread_setspecific(global_sched_key, sched) == 0);
+}
+
+Coroutine* scheSearchWait(int fd){
+    auto sche = getSched();
+    auto wset = sche -> waitingCos_;
+    auto it = wset.begin();
+    for(; it != wset.end(); ++ it){
+        if((*it) -> fd_ == fd) break;
+    }
+    if(it != wset.end()){
+        (*it) -> status_ = (CoroutineStatus)0;
+        return *it;
+    }
+    return nullptr;
+}
+Coroutine* scheDescheWait(int fd){
+    Coroutine* co = scheSearchWait(fd);
+    auto wset = getSched() -> waitingCos_;
+    if(co != nullptr){
+        wset.erase(co);
+        co -> scheduleDeschedAndSleepdown();
+    }
+    else{
+        printf("cannot find fd in wait set");
+    }
+    return co;
+}
 
 }
