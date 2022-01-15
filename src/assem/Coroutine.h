@@ -16,7 +16,7 @@ using proc_coroutine = std::function<void(void*)>;
 
 class Coroutine{
 public: 
-    Coroutine(CoroutineScheduler* sche, int stackSize, int id, 
+    Coroutine(CoroutineScheduler* sche, size_t stackSize, int id, 
                 proc_coroutine func, int fd, unsigned short events, void* args);
     ~Coroutine();
     void dofunc(){

@@ -143,7 +143,7 @@ inline CoroutineScheduler* getSched(){
     return (CoroutineScheduler*)pthread_getspecific(global_sched_key);
 }
 
-Coroutine::Coroutine(CoroutineScheduler* sche, int stackSize, int id, 
+Coroutine::Coroutine(CoroutineScheduler* sche, size_t stackSize, int id, 
                     proc_coroutine func, int fd, unsigned short events, void* args):
                     sche_(sche),
                     stackSize_(stackSize),
