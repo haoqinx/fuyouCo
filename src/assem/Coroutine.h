@@ -83,5 +83,6 @@ static inline void coroutineMadvise(Coroutine* co);
 static void schedKeyDestructor(void *data);
 static void schedKeyCreator(void);
 void scheSleepDown(Coroutine* co, uint64_t msecs);
+static inline CoroutineScheduler* getSched();
 } // namespace fuyou
 
