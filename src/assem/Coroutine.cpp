@@ -216,7 +216,7 @@ void Coroutine::renice(){
     yield();
 }
 
-void Coroutine::sleepdown(uint64_t msecs){
+void Coroutine::scheduleScheSleepdown(uint64_t msecs){
     uint64_t usecs = msecs * 1000u;
     auto sset = this -> sche_ -> sleepingCos_;
     auto co_tmp = sset.find(this);
@@ -228,10 +228,12 @@ void Coroutine::sleepdown(uint64_t msecs){
         auto res = sset.insert(this);
         if(res.second){
             printf("sleep_usecs %u\n", this -> sleepUsecs_);
+            this -> sleepUsecs_ ++;
+            continue;
         }
         this -> status_ = (CoroutineStatus)((unsigned int)this -> status_ | 
                     BIT(COROUTINE_STATUS_SLEEPING));
-    }while(false);
+    }while(true);
 }
 
 void Coroutine::scheduleDeschedAndSleepdown(){
@@ -252,7 +254,7 @@ void curCoroutineSleep(uint64_t msecs){
     }
     else{
         // scheSleepDown(co, msecs);
-        co -> sleepdown(msecs);
+        co -> scheduleScheSleepdown(msecs);
     }
 }
 //detach
@@ -349,6 +351,31 @@ Coroutine* scheDescheWait(int fd){
         printf("cannot find fd in wait set");
     }
     return co;
+}
+
+void Coroutine::scheduleScheWait(int fd, unsigned short events, uint64_t timeout){
+    if((int)status_ & BIT(COROUTINE_STATUS_WAIT_READ) || 
+        (int)status_ & BIT(COROUTINE_STATUS_WAIT_WRITE)){
+        printf("Unexpected event. lt id %lld fd %lld already in %ld state\n",
+            id_, fd_, status_);
+        assert(0);
+    }
+
+    if(events & POLLIN){
+        status_ = (CoroutineStatus)((int)status_ | COROUTINE_STATUS_WAIT_READ);
+    }
+    else if(events | POLLOUT){
+        status_ = (CoroutineStatus)((int)status_ | COROUTINE_STATUS_WAIT_WRITE);
+    }
+    else{
+        printf("events: %d\n", events);
+    }
+    fd_ = fd;
+    events_ = events;
+    auto co_tmp = sche_ -> waitingCos_.find(this);
+    assert(co_tmp == sche_ -> waitingCos_.end());
+    if(timeout == 1) return;
+
 }
 
 }

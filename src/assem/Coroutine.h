@@ -30,8 +30,9 @@ public:
     void init();
     void renice();
     // void sleep(uint64_t msecs);
-    void sleepdown(uint64_t msecs);
+    void scheduleScheSleepdown(uint64_t msecs);
     void scheduleDeschedAndSleepdown();
+    void scheduleScheWait(int fd, unsigned short events, uint64_t timeout);
 
 public:
     // using SP_CoroutineComputeSche = std::shared_ptr<CoroutineComputeSche>;
@@ -83,8 +84,8 @@ public:
 };
 // coroutine life cycle
 int coCreate(Coroutine** newCo, proc_coroutine func, void* args);
-inline int coSleepcmp(Coroutine* co1, Coroutine* co2);
-inline int coWaitcmp(Coroutine* co1, Coroutine* co2);
+// inline int coSleepcmp(Coroutine* co1, Coroutine* co2);
+// inline int coWaitcmp(Coroutine* co1, Coroutine* co2);
 //sche life cycle
 int scheCreate(int stacksize);
 
