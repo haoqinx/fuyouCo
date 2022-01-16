@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <sys/socket.h>
+
 #include <fcntl.h>
 #include <unistd.h>
+#include <assert.h>
 
 namespace fuyou
 {
@@ -165,6 +166,53 @@ ssize_t fuyouSend(int fd, const void *buf, size_t len, int flags){
 	return sent;
 }
 
+ssize_t fuyouSendto(int fd, const void *buf, size_t len, int flags,
+               const struct sockaddr *dest_addr, socklen_t addrlen){
+    int sent = 0;
+	while (sent < len) {
+		struct pollfd fds;
+		fds.fd = fd;
+		fds.events = POLLOUT | POLLERR | POLLHUP;
+
+		pollInner(&fds, 1, 1);
+		int ret = sendto(fd, ((char*)buf)+sent, len-sent, flags, dest_addr, addrlen);
+		if (ret <= 0) {
+			if (errno == EAGAIN) continue;
+			else if (errno == ECONNRESET) {
+				return ret;
+			}
+			printf("send errno : %d, ret : %d\n", errno, ret);
+			assert(0);
+		}
+		sent += ret;
+	}
+	return sent;
+}
+
+ssize_t fuyouRecvfrom(int fd, void *buf, size_t len, int flags,
+                 struct sockaddr *src_addr, socklen_t *addrlen) {
+
+	struct pollfd fds;
+	fds.fd = fd;
+	fds.events = POLLIN | POLLERR | POLLHUP;
+
+	pollInner(&fds, 1, 1);
+
+	int ret = recvfrom(fd, buf, len, flags, src_addr, addrlen);
+	if (ret < 0) {
+		if (errno == EAGAIN) return ret;
+		if (errno == ECONNRESET) return 0;
+		
+		printf("recv error : %d, ret : %d\n", errno, ret);
+		assert(0);
+	}
+	return ret;
+
+}
+
+int fuyouClose(int fd){
+    return close(fd);
+}
 
 } // namespace fuyou
 
