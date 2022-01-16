@@ -19,8 +19,9 @@ CMakeFiles/fuyou_co.dir/Epoll.cpp.o: ../Epoll.cpp
 CMakeFiles/fuyou_co.dir/Epoll.cpp.o: ../Epoll.h
 CMakeFiles/fuyou_co.dir/Epoll.cpp.o: ../Share.h
 
-CMakeFiles/fuyou_co.dir/Main.cpp.o: ../CoScheduler.h
-CMakeFiles/fuyou_co.dir/Main.cpp.o: ../Coroutine.h
-CMakeFiles/fuyou_co.dir/Main.cpp.o: ../Main.cpp
-CMakeFiles/fuyou_co.dir/Main.cpp.o: ../Share.h
+CMakeFiles/fuyou_co.dir/Socket.cpp.o: ../CoScheduler.h
+CMakeFiles/fuyou_co.dir/Socket.cpp.o: ../Coroutine.h
+CMakeFiles/fuyou_co.dir/Socket.cpp.o: ../Share.h
+CMakeFiles/fuyou_co.dir/Socket.cpp.o: ../Socket.cpp
+CMakeFiles/fuyou_co.dir/Socket.cpp.o: ../Socket.h
 

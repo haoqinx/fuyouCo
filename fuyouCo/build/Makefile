@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hqin/fuyouCo/src/assem
+CMAKE_SOURCE_DIR = /home/hqin/fuyouCo/fuyouCo
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hqin/fuyouCo/src/assem/build
+CMAKE_BINARY_DIR = /home/hqin/fuyouCo/fuyouCo/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/src/assem/build/CMakeFiles /home/hqin/fuyouCo/src/assem/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/fuyouCo/build/CMakeFiles /home/hqin/fuyouCo/fuyouCo/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/src/assem/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/fuyouCo/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -204,32 +204,32 @@ Epoll.cpp.s:
 	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/Epoll.cpp.s
 .PHONY : Epoll.cpp.s
 
-Main.o: Main.cpp.o
+Socket.o: Socket.cpp.o
 
-.PHONY : Main.o
+.PHONY : Socket.o
 
 # target to build an object file
-Main.cpp.o:
-	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/Main.cpp.o
-.PHONY : Main.cpp.o
+Socket.cpp.o:
+	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/Socket.cpp.o
+.PHONY : Socket.cpp.o
 
-Main.i: Main.cpp.i
+Socket.i: Socket.cpp.i
 
-.PHONY : Main.i
+.PHONY : Socket.i
 
 # target to preprocess a source file
-Main.cpp.i:
-	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/Main.cpp.i
-.PHONY : Main.cpp.i
+Socket.cpp.i:
+	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/Socket.cpp.i
+.PHONY : Socket.cpp.i
 
-Main.s: Main.cpp.s
+Socket.s: Socket.cpp.s
 
-.PHONY : Main.s
+.PHONY : Socket.s
 
 # target to generate assembly for a file
-Main.cpp.s:
-	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/Main.cpp.s
-.PHONY : Main.cpp.s
+Socket.cpp.s:
+	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/Socket.cpp.s
+.PHONY : Socket.cpp.s
 
 # Help Target
 help:
@@ -249,9 +249,9 @@ help:
 	@echo "... Epoll.o"
 	@echo "... Epoll.i"
 	@echo "... Epoll.s"
-	@echo "... Main.o"
-	@echo "... Main.i"
-	@echo "... Main.s"
+	@echo "... Socket.o"
+	@echo "... Socket.i"
+	@echo "... Socket.s"
 .PHONY : help
 
 

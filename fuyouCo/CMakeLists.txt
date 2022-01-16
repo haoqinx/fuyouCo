@@ -4,6 +4,7 @@ set(
     Coroutine.cpp
     CoScheduler.cpp
     Epoll.cpp
+    Socket.cpp
 )
 
 add_definitions(-std=c++11)
