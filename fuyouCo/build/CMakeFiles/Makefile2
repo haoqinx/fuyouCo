@@ -60,39 +60,39 @@ CMAKE_SOURCE_DIR = /home/hqin/fuyouCo/src/assem
 CMAKE_BINARY_DIR = /home/hqin/fuyouCo/src/assem/build
 
 #=============================================================================
-# Target rules for target CMakeFiles/main.dir
+# Target rules for target CMakeFiles/fuyou_co.dir
 
 # All Build rule for target.
-CMakeFiles/main.dir/all:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/hqin/fuyouCo/src/assem/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target main"
-.PHONY : CMakeFiles/main.dir/all
+CMakeFiles/fuyou_co.dir/all:
+	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/depend
+	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/hqin/fuyouCo/src/assem/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target fuyou_co"
+.PHONY : CMakeFiles/fuyou_co.dir/all
 
 # Include target in all.
-all: CMakeFiles/main.dir/all
+all: CMakeFiles/fuyou_co.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/main.dir/rule: cmake_check_build_system
+CMakeFiles/fuyou_co.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/src/assem/build/CMakeFiles 5
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/main.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/fuyou_co.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/src/assem/build/CMakeFiles 0
-.PHONY : CMakeFiles/main.dir/rule
+.PHONY : CMakeFiles/fuyou_co.dir/rule
 
 # Convenience name for target.
-main: CMakeFiles/main.dir/rule
+fuyou_co: CMakeFiles/fuyou_co.dir/rule
 
-.PHONY : main
-
-# clean rule for target.
-CMakeFiles/main.dir/clean:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/clean
-.PHONY : CMakeFiles/main.dir/clean
+.PHONY : fuyou_co
 
 # clean rule for target.
-clean: CMakeFiles/main.dir/clean
+CMakeFiles/fuyou_co.dir/clean:
+	$(MAKE) -f CMakeFiles/fuyou_co.dir/build.make CMakeFiles/fuyou_co.dir/clean
+.PHONY : CMakeFiles/fuyou_co.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/fuyou_co.dir/clean
 
 .PHONY : clean
 

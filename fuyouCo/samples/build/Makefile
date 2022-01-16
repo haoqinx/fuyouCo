@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hqin/fuyouCo/src/assem
+CMAKE_SOURCE_DIR = /home/hqin/fuyouCo/fuyouCo/samples
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hqin/fuyouCo/src/assem/build
+CMAKE_BINARY_DIR = /home/hqin/fuyouCo/fuyouCo/samples/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/src/assem/build/CMakeFiles /home/hqin/fuyouCo/src/assem/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/fuyouCo/samples/build/CMakeFiles /home/hqin/fuyouCo/fuyouCo/samples/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/src/assem/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hqin/fuyouCo/fuyouCo/samples/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,125 +111,44 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named main
+# Target rules for targets named server_base
 
 # Build rule for target.
-main: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 main
-.PHONY : main
+server_base: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 server_base
+.PHONY : server_base
 
 # fast build rule for target.
-main/fast:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-.PHONY : main/fast
+server_base/fast:
+	$(MAKE) -f CMakeFiles/server_base.dir/build.make CMakeFiles/server_base.dir/build
+.PHONY : server_base/fast
 
-CoScheduler.o: CoScheduler.cpp.o
+serverBase.o: serverBase.cpp.o
 
-.PHONY : CoScheduler.o
-
-# target to build an object file
-CoScheduler.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/CoScheduler.cpp.o
-.PHONY : CoScheduler.cpp.o
-
-CoScheduler.i: CoScheduler.cpp.i
-
-.PHONY : CoScheduler.i
-
-# target to preprocess a source file
-CoScheduler.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/CoScheduler.cpp.i
-.PHONY : CoScheduler.cpp.i
-
-CoScheduler.s: CoScheduler.cpp.s
-
-.PHONY : CoScheduler.s
-
-# target to generate assembly for a file
-CoScheduler.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/CoScheduler.cpp.s
-.PHONY : CoScheduler.cpp.s
-
-Coroutine.o: Coroutine.cpp.o
-
-.PHONY : Coroutine.o
+.PHONY : serverBase.o
 
 # target to build an object file
-Coroutine.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Coroutine.cpp.o
-.PHONY : Coroutine.cpp.o
+serverBase.cpp.o:
+	$(MAKE) -f CMakeFiles/server_base.dir/build.make CMakeFiles/server_base.dir/serverBase.cpp.o
+.PHONY : serverBase.cpp.o
 
-Coroutine.i: Coroutine.cpp.i
+serverBase.i: serverBase.cpp.i
 
-.PHONY : Coroutine.i
-
-# target to preprocess a source file
-Coroutine.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Coroutine.cpp.i
-.PHONY : Coroutine.cpp.i
-
-Coroutine.s: Coroutine.cpp.s
-
-.PHONY : Coroutine.s
-
-# target to generate assembly for a file
-Coroutine.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Coroutine.cpp.s
-.PHONY : Coroutine.cpp.s
-
-Epoll.o: Epoll.cpp.o
-
-.PHONY : Epoll.o
-
-# target to build an object file
-Epoll.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Epoll.cpp.o
-.PHONY : Epoll.cpp.o
-
-Epoll.i: Epoll.cpp.i
-
-.PHONY : Epoll.i
+.PHONY : serverBase.i
 
 # target to preprocess a source file
-Epoll.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Epoll.cpp.i
-.PHONY : Epoll.cpp.i
+serverBase.cpp.i:
+	$(MAKE) -f CMakeFiles/server_base.dir/build.make CMakeFiles/server_base.dir/serverBase.cpp.i
+.PHONY : serverBase.cpp.i
 
-Epoll.s: Epoll.cpp.s
+serverBase.s: serverBase.cpp.s
 
-.PHONY : Epoll.s
-
-# target to generate assembly for a file
-Epoll.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Epoll.cpp.s
-.PHONY : Epoll.cpp.s
-
-Main.o: Main.cpp.o
-
-.PHONY : Main.o
-
-# target to build an object file
-Main.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Main.cpp.o
-.PHONY : Main.cpp.o
-
-Main.i: Main.cpp.i
-
-.PHONY : Main.i
-
-# target to preprocess a source file
-Main.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Main.cpp.i
-.PHONY : Main.cpp.i
-
-Main.s: Main.cpp.s
-
-.PHONY : Main.s
+.PHONY : serverBase.s
 
 # target to generate assembly for a file
-Main.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Main.cpp.s
-.PHONY : Main.cpp.s
+serverBase.cpp.s:
+	$(MAKE) -f CMakeFiles/server_base.dir/build.make CMakeFiles/server_base.dir/serverBase.cpp.s
+.PHONY : serverBase.cpp.s
 
 # Help Target
 help:
@@ -238,20 +157,11 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... main"
+	@echo "... server_base"
 	@echo "... edit_cache"
-	@echo "... CoScheduler.o"
-	@echo "... CoScheduler.i"
-	@echo "... CoScheduler.s"
-	@echo "... Coroutine.o"
-	@echo "... Coroutine.i"
-	@echo "... Coroutine.s"
-	@echo "... Epoll.o"
-	@echo "... Epoll.i"
-	@echo "... Epoll.s"
-	@echo "... Main.o"
-	@echo "... Main.i"
-	@echo "... Main.s"
+	@echo "... serverBase.o"
+	@echo "... serverBase.i"
+	@echo "... serverBase.s"
 .PHONY : help
 
 

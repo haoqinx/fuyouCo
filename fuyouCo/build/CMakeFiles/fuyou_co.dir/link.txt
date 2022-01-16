@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfuyou_co.a  CMakeFiles/fuyou_co.dir/Coroutine.cpp.o CMakeFiles/fuyou_co.dir/CoScheduler.cpp.o CMakeFiles/fuyou_co.dir/Epoll.cpp.o CMakeFiles/fuyou_co.dir/Main.cpp.o
+/usr/bin/ranlib libfuyou_co.a

@@ -1,0 +1,3 @@
+/home/hqin/fuyouCo/fuyouCo/samples/build/CMakeFiles/rebuild_cache.dir
+/home/hqin/fuyouCo/fuyouCo/samples/build/CMakeFiles/server_base.dir
+/home/hqin/fuyouCo/fuyouCo/samples/build/CMakeFiles/edit_cache.dir
