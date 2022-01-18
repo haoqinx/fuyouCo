@@ -65,6 +65,8 @@ Epoll.h
 /home/hqin/fuyouCo/fuyouCo/Epoll.h
 CoScheduler.h
 /home/hqin/fuyouCo/fuyouCo/CoScheduler.h
+iostream
+-
 
 /home/hqin/fuyouCo/fuyouCo/Coroutine.h
 Share.h

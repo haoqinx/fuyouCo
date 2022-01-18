@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "Epoll.h"
 #include "CoScheduler.h"
+#include <iostream>
 
 namespace fuyou
 {
@@ -281,13 +282,16 @@ int coCreate(Coroutine** newCo, proc_coroutine func, void* args){
                                   -1, //fd
                                   0,//events
                                   args);
-    *newCo = co;
+    
     int ret = posix_memalign(&co -> stack_, getpagesize(), sche -> stackSize_);
     if(ret) {
         printf("failed to allocate stack for new co\n");
         delete(co);
         return -3;
     }
+    *newCo = co;
+    co -> sche_ ->readyCos_.push(co);
+    printf("Create coroutine success\n");
     return 0;
 }
 // inline int coSleepcmp(Coroutine* co1, Coroutine* co2){
@@ -346,12 +350,13 @@ Coroutine* scheSearchWait(int fd){
 Coroutine* scheDescheWait(int fd){
     Coroutine* co = scheSearchWait(fd);
     auto wset = getSched() -> waitingCos_;
-    if(co != nullptr){
-        wset.erase(co);
-        co -> scheduleDeschedAndSleepdown();
+    auto curco = wset.find(co);
+    if(curco != wset.end()){
+        wset.erase(curco);
+        (*curco) -> scheduleDeschedAndSleepdown();
     }
     else{
-        printf("cannot find fd in wait set");
+        printf("cannot find fd in wait set\n");
     }
     return co;
 }
@@ -388,12 +393,15 @@ void scheRun(){
     }
     while(! sche -> isDone()){
         // 1: sleep set
+        std::cout << "sleep step...\n";
         Coroutine* expired = nullptr;
         while((expired = sche -> scheduleExpired()) != nullptr){
             expired -> resume();
         }
         // 2:ready queue
+        std::cout << "ready step...\n";
         auto readyq = sche -> readyCos_;
+        std::cout << "readyq size:" << readyq.size() << "\n";
         Coroutine* last_co_ready = readyq.back();
         while(! readyq.empty()){
             Coroutine* co = readyq.front();
@@ -408,9 +416,10 @@ void scheRun(){
             }
         }
         //3：wait set
+        std::cout << "wait step...\n";
         sche -> doEpoll();
         while(sche -> nNewevents_){
-            int index = -- sche -> nNewevents_;
+            int index = -- sche -> nNewevents_; 
             struct epoll_event* ev = &(sche -> eventlist_[index]);
             int fd = ev -> data.fd;
             int is_eof = ev -> events & EPOLLHUP;
