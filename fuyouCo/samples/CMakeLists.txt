@@ -6,3 +6,4 @@ link_directories(/home/hqin/fuyouCo/fuyouCo/build)
 
 add_executable(server_base ${SRCS})
 target_link_libraries(server_base fuyou_co)
+target_link_libraries(server_base pthread rt)

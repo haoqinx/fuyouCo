@@ -40,11 +40,29 @@ vector
 
 /home/hqin/fuyouCo/fuyouCo/Share.h
 
+/home/hqin/fuyouCo/fuyouCo/Socket.h
+Coroutine.h
+/home/hqin/fuyouCo/fuyouCo/Coroutine.h
+CoScheduler.h
+/home/hqin/fuyouCo/fuyouCo/CoScheduler.h
+sys/socket.h
+-
+
 /home/hqin/fuyouCo/fuyouCo/samples/serverBase.cpp
 ../Coroutine.h
 /home/hqin/fuyouCo/fuyouCo/Coroutine.h
 ../CoScheduler.h
 /home/hqin/fuyouCo/fuyouCo/CoScheduler.h
+../Socket.h
+/home/hqin/fuyouCo/fuyouCo/Socket.h
 iostream
+-
+arpa/inet.h
+-
+string.h
+-
+sys/time.h
+-
+sys/socket.h
 -
 

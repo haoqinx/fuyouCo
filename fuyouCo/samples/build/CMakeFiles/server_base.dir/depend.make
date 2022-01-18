@@ -4,5 +4,6 @@
 CMakeFiles/server_base.dir/serverBase.cpp.o: /home/hqin/fuyouCo/fuyouCo/CoScheduler.h
 CMakeFiles/server_base.dir/serverBase.cpp.o: /home/hqin/fuyouCo/fuyouCo/Coroutine.h
 CMakeFiles/server_base.dir/serverBase.cpp.o: /home/hqin/fuyouCo/fuyouCo/Share.h
+CMakeFiles/server_base.dir/serverBase.cpp.o: /home/hqin/fuyouCo/fuyouCo/Socket.h
 CMakeFiles/server_base.dir/serverBase.cpp.o: ../serverBase.cpp
 

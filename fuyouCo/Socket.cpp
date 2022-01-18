@@ -122,6 +122,24 @@ int fuyouAccept(int fd, struct sockaddr* addr, socklen_t* len){
 	return sockfd;
 }
 
+ssize_t fuyouRecv(int fd, void *buf, size_t len, int flags) {
+	
+	struct pollfd fds;
+	fds.fd = fd;
+	fds.events = POLLIN | POLLERR | POLLHUP;
+
+	pollInner(&fds, 1, 1);
+
+	int ret = recv(fd, buf, len, flags);
+	if (ret < 0) {
+		//if (errno == EAGAIN) return ret;
+		if (errno == ECONNRESET) return -1;
+		//printf("recv error : %d, ret : %d\n", errno, ret);
+		
+	}
+	return ret;
+}
+
 int fuyouConnect(int fd, struct sockaddr* name, socklen_t namelen){
     int ret = 0;
     while(true){

@@ -13,6 +13,7 @@ int fuyouConnect(int fd, struct sockaddr* name, socklen_t namelen);
 ssize_t fuyouSend(int fd, const void *buf, size_t len, int flags);
 ssize_t fuyouSendto(int fd, const void *buf, size_t len, int flags,
                const struct sockaddr *dest_addr, socklen_t addrlen);
+ssize_t fuyouRecv(int fd, void *buf, size_t len, int flags);
 ssize_t fuyouRecvfrom(int fd, void *buf, size_t len, int flags,
                  struct sockaddr *src_addr, socklen_t *addrlen);
 int fuyouClose(int fd);
