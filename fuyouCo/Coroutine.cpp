@@ -393,8 +393,9 @@ void Coroutine::scheduleScheWait(int fd, unsigned short events, uint64_t timeout
     }
     fd_ = fd;
     events_ = events;
+    this -> sche_ -> waitingCos_.insert(this);
     auto co_tmp = sche_ -> waitingCos_.find(this);
-    assert(co_tmp == sche_ -> waitingCos_.end());
+    assert(co_tmp != sche_ -> waitingCos_.end());
     if(timeout == 1) return;
     scheduleScheSleepdown(timeout);
 }
@@ -430,13 +431,14 @@ void scheRun(){
         }
         //3：wait set
         std::cout << "wait step...\n";
-        std::cout << "wait step readyq.empty() ???" << readyq.empty() << std::endl;
         sche -> doEpoll();
+        printf("------------ size: %d\n",sche -> nNewevents_);
         while(sche -> nNewevents_){
             int index = -- sche -> nNewevents_; 
             struct epoll_event* ev = &(sche -> eventlist_[index]);
             int fd = ev -> data.fd;
             int is_eof = ev -> events & EPOLLHUP;
+            if (is_eof) errno = ECONNRESET;
             Coroutine* co = scheSearchWait(fd);
             if(co != nullptr){
                 if(is_eof){

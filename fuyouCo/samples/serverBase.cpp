@@ -51,7 +51,7 @@ void server(void* args){
     local.sin_addr.s_addr = INADDR_ANY;
     bind(fd, (struct sockaddr*)&local, sizeof(local));
     listen(fd, 2048);
-    printf("listen port：%d\n", port);
+    printf("listen port: %d\n", port);
     struct timeval tv_begin;
     gettimeofday(&tv_begin, nullptr);
     while(true){
@@ -68,7 +68,6 @@ void server(void* args){
 		fuyou::Coroutine *readCo;
 		fuyou::coCreate(&readCo, serverRead, &cli_fd);
     }
-    
 }
 int main(){
     fuyou::Coroutine* co;

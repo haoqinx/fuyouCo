@@ -24,6 +24,7 @@ CoroutineScheduler::CoroutineScheduler(int stackSize, int pagesize,
     busyCos_.clear();
     sleepingCos_.clear();
     waitingCos_.clear();
+    eventlist_.reserve(CO_MAX_EVENTS);
 }
 
 CoroutineScheduler::~CoroutineScheduler(){
@@ -75,7 +76,7 @@ int CoroutineScheduler::doEpoll(){
     nNewevents_ = 0;
     struct timespec t = {0, 0};
     uint64_t usecs = minTimeout();
-    printf("is empty?? %d", readyCos_.empty());
+    printf("is empty?? %d\n", readyCos_.empty());
     if(usecs && readyCos_.empty()){
         t.tv_sec = usecs / 1000000u;
 		if (t.tv_sec != 0) {
@@ -95,6 +96,7 @@ int CoroutineScheduler::doEpoll(){
             if(errno == EINTR) continue;
             else{
                 perror("epoll wait error");
+                exit(-1);
             }
         }
         break;
