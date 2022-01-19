@@ -11,7 +11,8 @@
 namespace fuyou
 {
 pthread_key_t global_sched_key;
-static pthread_once_t sched_key_once = PTHREAD_ONCE_INIT;
+pthread_once_t sched_key_once = PTHREAD_ONCE_INIT;
+
 //static functions
 inline uint64_t coroutineDiff(uint64_t t1, uint64_t t2){
     return t2 - t1;
@@ -39,8 +40,14 @@ void schedKeyDestructor(void *data){
 }
 
 void schedKeyCreator(void){
-    assert(pthread_key_create(&global_sched_key, schedKeyDestructor) == 0);
-	assert(pthread_setspecific(global_sched_key, NULL) == 0);
+    if(pthread_key_create(&global_sched_key, schedKeyDestructor) != 0){
+        perror("create pthread_key_t scheduler error\n");
+        exit(-1);
+    }
+	if(pthread_setspecific(global_sched_key, NULL) != 0){
+        perror("remove global_sched_key error\n");
+        exit(-1);
+    }
 	return ;
 }
 
@@ -141,6 +148,7 @@ static void _exec(void *lt){
 }
 
 inline CoroutineScheduler* getSched(){
+    printf("getSched addr: %p \n",(CoroutineScheduler*)pthread_getspecific(global_sched_key));
     return (CoroutineScheduler*)pthread_getspecific(global_sched_key);
 }
 
@@ -183,11 +191,13 @@ void Coroutine::init(){
 }
 
 void Coroutine::yield(){
+    printf("do yield.....\n");
     ops_ = 0;
     _switch(&(sche_ -> ctx_), &ctx_);
 }
 
 int Coroutine::resume(){
+    printf("do resume....\n");
     if((unsigned int)status_ & BIT(COROUTINE_STATUS_NEW)){
         init();
     }
@@ -195,7 +205,6 @@ int Coroutine::resume(){
     sche -> currCos_ = this;
     _switch(&ctx_, &(sche_ -> ctx_));
     sche -> currCos_ = nullptr;
-
     coroutineMadvise(this);
     if((unsigned int)status_ & BIT(COROUTINE_STATUS_EXITED)){
         if((unsigned int)status_ & BIT(COROUTINE_STATUS_DETACH)){
@@ -217,7 +226,7 @@ void Coroutine::renice(){
 
 void Coroutine::scheduleScheSleepdown(uint64_t msecs){
     uint64_t usecs = msecs * 1000u;
-    auto sset = this -> sche_ -> sleepingCos_;
+    auto& sset = this -> sche_ -> sleepingCos_;
     auto co_tmp = sset.find(this);
     if(co_tmp != sset.end()){
         sset.erase(co_tmp);
@@ -265,6 +274,7 @@ void curCoroutineDetach(){
 
 int coCreate(Coroutine** newCo, proc_coroutine func, void* args){
     assert(pthread_once(&sched_key_once, schedKeyCreator) == 0);
+    pthread_once(&sched_key_once, schedKeyCreator);
     CoroutineScheduler* sche = getSched();
     if(sche == nullptr){
         scheCreate(0);
@@ -290,7 +300,7 @@ int coCreate(Coroutine** newCo, proc_coroutine func, void* args){
         return -3;
     }
     *newCo = co;
-    co -> sche_ ->readyCos_.push(co);
+    co -> sche_ -> readyCos_.push(co);
     printf("Create coroutine success\n");
     return 0;
 }
@@ -326,7 +336,10 @@ int scheCreate(int stacksize){
         printf("Fail to init scheduler");
         return -1;
     }
-    assert(pthread_setspecific(global_sched_key, sched) == 0);
+    if(pthread_setspecific(global_sched_key, sched) != 0){
+        perror("global scheduler set error");
+        exit(-1);
+    }
 }
 
 void scheFree(CoroutineScheduler* sche){
@@ -335,8 +348,8 @@ void scheFree(CoroutineScheduler* sche){
 }
 
 Coroutine* scheSearchWait(int fd){
-    auto sche = getSched();
-    auto wset = sche -> waitingCos_;
+    CoroutineScheduler* sche = getSched();
+    auto& wset = sche -> waitingCos_;
     auto it = wset.begin();
     for(; it != wset.end(); ++ it){
         if((*it) -> fd_ == fd) break;
@@ -349,7 +362,7 @@ Coroutine* scheSearchWait(int fd){
 }
 Coroutine* scheDescheWait(int fd){
     Coroutine* co = scheSearchWait(fd);
-    auto wset = getSched() -> waitingCos_;
+    auto& wset = getSched() -> waitingCos_;
     auto curco = wset.find(co);
     if(curco != wset.end()){
         wset.erase(curco);
@@ -400,7 +413,7 @@ void scheRun(){
         }
         // 2:ready queue
         std::cout << "ready step...\n";
-        auto readyq = sche -> readyCos_;
+        auto& readyq = sche -> readyCos_;
         std::cout << "readyq size:" << readyq.size() << "\n";
         Coroutine* last_co_ready = readyq.back();
         while(! readyq.empty()){
@@ -417,6 +430,7 @@ void scheRun(){
         }
         //3：wait set
         std::cout << "wait step...\n";
+        std::cout << "wait step readyq.empty() ???" << readyq.empty() << std::endl;
         sche -> doEpoll();
         while(sche -> nNewevents_){
             int index = -- sche -> nNewevents_; 

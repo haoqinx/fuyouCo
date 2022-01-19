@@ -17,7 +17,6 @@ void serverRead(void* arg){
     struct pollfd fds;
     fds.fd = fd;
     fds.events = POLLIN;
-    
     while(true){
         char buf[1024] = {0};
         ret = fuyou::fuyouRecv(fd, buf, 1024, 0);
@@ -53,10 +52,8 @@ void server(void* args){
     bind(fd, (struct sockaddr*)&local, sizeof(local));
     listen(fd, 2048);
     printf("listen port：%d\n", port);
-
     struct timeval tv_begin;
     gettimeofday(&tv_begin, nullptr);
-
     while(true){
         socklen_t len = sizeof(struct sockaddr_in);
         int cli_fd = fuyou::fuyouAccept(fd, (struct sockaddr*)&remote, & len);
@@ -67,11 +64,11 @@ void server(void* args){
 			int time_used = timeSubms(tv_begin, tv_cur);
 			printf("client fd : %d, time_used: %d\n", cli_fd, time_used);
         }
-
         printf("new client comming\n");
 		fuyou::Coroutine *readCo;
 		fuyou::coCreate(&readCo, serverRead, &cli_fd);
     }
+    
 }
 int main(){
     fuyou::Coroutine* co;
@@ -84,8 +81,8 @@ int main(){
     //     printf("create %d\n", i);
 	// }
     unsigned short *port = (unsigned short*)malloc(sizeof(unsigned short));
+    *port = base_port;
     fuyou::coCreate(&co, server, port); 
-
 	fuyou::scheRun(); //run
     return 0;
 }

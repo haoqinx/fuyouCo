@@ -84,5 +84,4 @@ public:
 int scheCreate(int stacksize);
 void scheSleepDown(Coroutine* co, uint64_t msecs);
 
-
 };

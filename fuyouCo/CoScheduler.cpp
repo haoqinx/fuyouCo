@@ -21,7 +21,9 @@ CoroutineScheduler::CoroutineScheduler(int stackSize, int pagesize,
                     timeout_(tiemout),
                     birth_(coroutineUsecNow()){
     bzero(&ctx_, sizeof(ctx_));
-
+    busyCos_.clear();
+    sleepingCos_.clear();
+    waitingCos_.clear();
 }
 
 CoroutineScheduler::~CoroutineScheduler(){
@@ -69,14 +71,17 @@ uint64_t CoroutineScheduler::minTimeout(){
 }
 
 int CoroutineScheduler::doEpoll(){
+    printf("start do epoll\n");
     nNewevents_ = 0;
     struct timespec t = {0, 0};
     uint64_t usecs = minTimeout();
+    printf("is empty?? %d", readyCos_.empty());
     if(usecs && readyCos_.empty()){
         t.tv_sec = usecs / 1000000u;
 		if (t.tv_sec != 0) {
 			t.tv_nsec = (usecs % 1000u) * 1000u;
-		} else {
+		} 
+        else {
 			t.tv_nsec = usecs * 1000u;
 		}
     }
