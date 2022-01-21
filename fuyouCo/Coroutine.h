@@ -96,7 +96,7 @@ inline void coroutineMadvise(Coroutine* co);
 void schedKeyDestructor(void *data);
 void schedKeyCreator(void);
 void scheSleepDown(Coroutine* co, uint64_t msecs);
-inline CoroutineScheduler* getSched();
+CoroutineScheduler* getSched();
 // find co by fd
 Coroutine* scheSearchWait(int fd);
 // find co in waitset and sleep

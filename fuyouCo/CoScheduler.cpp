@@ -72,11 +72,9 @@ uint64_t CoroutineScheduler::minTimeout(){
 }
 
 int CoroutineScheduler::doEpoll(){
-    printf("start do epoll\n");
     nNewevents_ = 0;
     struct timespec t = {0, 0};
     uint64_t usecs = minTimeout();
-    printf("is empty?? %d\n", readyCos_.empty());
     if(usecs && readyCos_.empty()){
         t.tv_sec = usecs / 1000000u;
 		if (t.tv_sec != 0) {

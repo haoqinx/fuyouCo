@@ -148,7 +148,7 @@ static void _exec(void *lt){
 }
 
 inline CoroutineScheduler* getSched(){
-    printf("getSched addr: %p \n",(CoroutineScheduler*)pthread_getspecific(global_sched_key));
+    //printf("getSched addr: %p \n",(CoroutineScheduler*)pthread_getspecific(global_sched_key));
     return (CoroutineScheduler*)pthread_getspecific(global_sched_key);
 }
 
@@ -156,7 +156,7 @@ Coroutine::Coroutine(CoroutineScheduler* sche, size_t stackSize, int id,
                     proc_coroutine func, int fd, unsigned short events, void* args):
                     sche_(sche),
                     stackSize_(stackSize),
-                    status_((CoroutineStatus) BIT(COROUTINE_STATUS_NEW)),
+                    status_((CoroutineStatus)BIT(COROUTINE_STATUS_NEW)),
                     id_(id),
                     func_(func),
                     fd_(fd),
@@ -191,13 +191,11 @@ void Coroutine::init(){
 }
 
 void Coroutine::yield(){
-    printf("do yield.....\n");
     ops_ = 0;
     _switch(&(sche_ -> ctx_), &ctx_);
 }
 
 int Coroutine::resume(){
-    printf("do resume....\n");
     if((unsigned int)status_ & BIT(COROUTINE_STATUS_NEW)){
         init();
     }
@@ -219,7 +217,6 @@ int Coroutine::resume(){
 void Coroutine::renice(){
     ++ ops_;
     if(ops_ < 5) return;
-    printf("%d renice....", id_);
     sche_ -> readyCos_.push(this);
     yield();
 }
@@ -407,21 +404,19 @@ void scheRun(){
     }
     while(! sche -> isDone()){
         // 1: sleep set
-        std::cout << "sleep step...\n";
         Coroutine* expired = nullptr;
         while((expired = sche -> scheduleExpired()) != nullptr){
             expired -> resume();
         }
         // 2:ready queue
-        std::cout << "ready step...\n";
         auto& readyq = sche -> readyCos_;
-        std::cout << "readyq size:" << readyq.size() << "\n";
         Coroutine* last_co_ready = readyq.back();
         while(! readyq.empty()){
             Coroutine* co = readyq.front();
             readyq.pop();
             if((unsigned int)co -> status_ & BIT(COROUTINE_STATUS_FDEOF)){
                 delete(co);
+                printf("delete co : %d\n", co->id_);
                 break;
             }
             else{
@@ -430,9 +425,7 @@ void scheRun(){
             }
         }
         //3：wait set
-        std::cout << "wait step...\n";
         sche -> doEpoll();
-        printf("------------ size: %d\n",sche -> nNewevents_);
         while(sche -> nNewevents_){
             int index = -- sche -> nNewevents_; 
             struct epoll_event* ev = &(sche -> eventlist_[index]);

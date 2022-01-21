@@ -65,4 +65,10 @@ sys/time.h
 -
 sys/socket.h
 -
+dlfcn.h
+-
+stdio.h
+-
+stdlib.h
+-
 

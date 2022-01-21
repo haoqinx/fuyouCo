@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/hqin/fuyouCo/fuyouCo/samples/Memleak.c
+dlfcn.h
+-
+stdio.h
+-
+stdlib.h
+-
+

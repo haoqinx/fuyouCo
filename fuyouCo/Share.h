@@ -3,6 +3,7 @@
 
 
 namespace fuyou{
+
 enum CoroutineStatus {
     COROUTINE_STATUS_WAIT_READ = 0,
     COROUTINE_STATUS_WAIT_WRITE,

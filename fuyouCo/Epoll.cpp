@@ -27,7 +27,6 @@ int epollerCtl(void) {
 }
 
 int epollerWait(struct timespec t){
-    printf("do epoll wait\n");
     CoroutineScheduler* sche = getSched();
     return epoll_wait(sche -> pollerfd_, &*(sche -> eventlist_.begin()), CO_MAX_EVENTS, t.tv_sec*1000.0 + t.tv_nsec/1000000.0);
 }

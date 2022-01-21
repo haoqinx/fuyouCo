@@ -45,7 +45,7 @@ int pollInner(struct pollfd* fds, nfds_t nfds, int timeout){
 	CoroutineScheduler *sched = getSched();
 	Coroutine *co = sched -> currCos_;
 	
-	int i = 0;
+	size_t i = 0;
 	for ( ; i < nfds; ++ i) {
 	
 		struct epoll_event ev;
@@ -87,8 +87,7 @@ int fuyouSocket(int domain, int type, int protocol){
 int fuyouAccept(int fd, struct sockaddr* addr, socklen_t* len){
     int sockfd = -1;
 	int timeout = 1;
-	Coroutine *co = getSched()->currCos_;
-	
+	// Coroutine *co = getSched()->currCos_;
 	while (true) {
 		struct pollfd fds;
 		fds.fd = fd;
@@ -163,9 +162,8 @@ int fuyouConnect(int fd, struct sockaddr* name, socklen_t namelen){
 }
 
 ssize_t fuyouSend(int fd, const void *buf, size_t len, int flags){
-    int sent = 0;
-
-	int ret = send(fd, ((char*)buf)+sent, len-sent, flags);
+    size_t sent = 0;
+	int ret = send(fd, ((char*)buf) + sent, len - sent, flags);
 	if (ret == 0) return ret;
 	if (ret > 0) sent += ret;
 	while (sent < len) {
@@ -186,7 +184,7 @@ ssize_t fuyouSend(int fd, const void *buf, size_t len, int flags){
 
 ssize_t fuyouSendto(int fd, const void *buf, size_t len, int flags,
                const struct sockaddr *dest_addr, socklen_t addrlen){
-    int sent = 0;
+    size_t sent = 0;
 	while (sent < len) {
 		struct pollfd fds;
 		fds.fd = fd;

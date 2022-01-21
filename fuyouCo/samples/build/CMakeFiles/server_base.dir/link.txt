@@ -1,1 +1,1 @@
-/usr/bin/c++   -O0 -Wall -g2 -ggdb   CMakeFiles/server_base.dir/serverBase.cpp.o  -o server_base  -L/home/hqin/fuyouCo/fuyouCo/build -Wl,-rpath,/home/hqin/fuyouCo/fuyouCo/build -lfuyou_co -lpthread -lrt 
+/usr/bin/c++   -O0 -Wall -g2 -ggdb   CMakeFiles/server_base.dir/serverBase.cpp.o  -o server_base  -L/home/hqin/fuyouCo/fuyouCo/build -Wl,-rpath,/home/hqin/fuyouCo/fuyouCo/build -lfuyou_co -ldl -lpthread -lrt 

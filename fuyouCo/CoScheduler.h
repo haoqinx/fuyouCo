@@ -11,8 +11,8 @@
 
 namespace fuyou
 {
-#define BIT(x)      (1 << (x))
-#define CLEARBIT(x) ~(1 << (x))
+#define BIT(x)      (unsigned int)(1 << (x))
+#define CLEARBIT(x) (unsigned int)~(1 << (x))
 class Coroutine;
 // using SP_Coroutine = std::shared_ptr<Coroutine>;
 
