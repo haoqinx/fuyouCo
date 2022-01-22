@@ -37,6 +37,8 @@ sys/poll.h
 -
 vector
 -
+unistd.h
+-
 
 /home/hqin/fuyouCo/fuyouCo/Share.h
 
@@ -65,10 +67,6 @@ sys/time.h
 -
 sys/socket.h
 -
-dlfcn.h
--
-stdio.h
--
-stdlib.h
+jemalloc/jemalloc.h
 -
 

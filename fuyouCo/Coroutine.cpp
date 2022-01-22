@@ -36,7 +36,7 @@ inline void coroutineMadvise(Coroutine* co){
 }
 
 void schedKeyDestructor(void *data){
-    free(data);
+    delete(data);
 }
 
 void schedKeyCreator(void){
@@ -174,7 +174,7 @@ Coroutine::~Coroutine(){
         perror("no shce");
     }
     if(stack_ != nullptr){
-        free(stack_);
+        delete(stack_);
         stack_ = nullptr;
     }
 

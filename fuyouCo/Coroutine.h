@@ -4,6 +4,7 @@
 #include <memory>
 #include <sys/poll.h>
 #include <vector>
+#include <unistd.h>
 namespace fuyou
 {
 class CoroutineScheduler;
@@ -21,6 +22,7 @@ public:
     ~Coroutine();
     void dofunc(){
         func_(args_);
+        
     }
     void yield();
     void setStatus();
