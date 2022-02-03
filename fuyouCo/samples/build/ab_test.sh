@@ -1,3 +1,2 @@
 #!/bin/bash
-rm ./fuyou/base/log/fuyou.log
-ab -c 1000 -n 10000 http://localhost:6666/hello
+ab -c 1000 -n 100000 http://localhost:6666/hello

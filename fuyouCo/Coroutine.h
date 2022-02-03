@@ -5,6 +5,7 @@
 #include <sys/poll.h>
 #include <vector>
 #include <unistd.h>
+#include <atomic>
 namespace fuyou
 {
 class CoroutineScheduler;
@@ -80,6 +81,9 @@ public:
     int fdsReady_;
     std::vector<struct pollfd> pfds_; 
     nfds_t nfds_;
+
+    //delete flag
+    std::atomic<bool> isfinished_;
 
 };
 // coroutine life cycle

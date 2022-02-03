@@ -161,7 +161,8 @@ Coroutine::Coroutine(CoroutineScheduler* sche, size_t stackSize, int id,
                     fd_(fd),
                     events_(events),
                     args_(args),
-                    birth_(coroutineUsecNow()){
+                    birth_(coroutineUsecNow()),
+                    isfinished_(false){
 
 }
 
@@ -176,7 +177,6 @@ Coroutine::~Coroutine(){
         delete(stack_);
         stack_ = nullptr;
     }
-
 }
 void Coroutine::init(){
     void** stack = (void**)(stack_ + stackSize_);
@@ -207,6 +207,7 @@ int Coroutine::resume(){
         if((unsigned int)status_ & BIT(COROUTINE_STATUS_DETACH)){
             printf("resume...");
             //nty_coroutine_free(co);
+            isfinished_ = true;
         }
         return -1;
     }
@@ -406,6 +407,10 @@ void scheRun(){
         Coroutine* expired = nullptr;
         while((expired = sche -> scheduleExpired()) != nullptr){
             expired -> resume();
+            if(expired -> isfinished_){
+                delete(expired);
+                printf("delete co , expired...");
+            }
         }
         // 2:ready queue
         auto& readyq = sche -> readyCos_;
@@ -420,6 +425,10 @@ void scheRun(){
             }
             else{
                 co -> resume();
+                if(co -> isfinished_){
+                    delete(co);
+                    printf("delete co , finished1...");
+                }
                 if(co == last_co_ready) break;
             }
         }
@@ -437,6 +446,10 @@ void scheRun(){
                     co -> status_ = (CoroutineStatus)((unsigned int)(co -> status_) | COROUTINE_STATUS_FDEOF);
                 }
                 co -> resume();
+                if(co -> isfinished_){
+                    delete(co);
+                    printf("delete co , finished2...");
+                }
             }
             is_eof = 0;
         }

@@ -81,6 +81,8 @@ vector
 -
 unistd.h
 -
+atomic
+-
 
 /home/hqin/fuyouCo/fuyouCo/Epoll.cpp
 Epoll.h
